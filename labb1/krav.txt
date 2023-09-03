@@ -1,0 +1,28 @@
+KRAV:
+
+Sökning:
+- Inte case-sensitive
+
+Utmatning:
+- Börja med sträng som anger antalet förekomster
+- Därefter ska varje förekomst av ordet presenteras på varje rad med till exempel 30 tecken före och 30 tecken efter.
+- Ersätt radbyten med mellanslag.
+- Om det finns fler än 25 förekomster ska programmet fråga användaren om vederbörande vill ha förekomsterna utskrivna på skärmen.
+
+Inmatning:
+- Söka genom python3 konkordans.py <word>
+
+Tid:
+- Svaret måste komma inom en sekund på skolans Ubuntudatorer (fjärrinloggning)
+- Konstruktionsprogrammet får inte ta mer än 3 minuter att skapa konkordansen på Ubuntudator (utöver tokenizer och sort tid)
+
+Redovisning:
+- Sker på skolans Ubuntudatorer (fjärrinloggning)
+
+Programkrav:
+- Sökprogrammet ska inte läsa igenom hela texten och får inte använda speciellt mycket internminne.
+- Internminnesbehovet ska inte växa med antalet distinkta ord i den ursprungliga texten (med andra ord ha konstant internminneskomplexitet).
+- Ni ska därför använda latmanshashning (se föreläsning 3) som datastruktur.
+- Prova att bara använda linjärsökning och jämför med att använda binärsökning tills sökintervallet är lika och se om det gör stor skillnad i körtid. 
+- Använd sedan den snabbaste sökningen.
+- Vid redovisningen ska ni kunna motivera varför internminneskomplexiteten är konstant för sökprogrammet.
