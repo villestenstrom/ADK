@@ -1,8 +1,9 @@
 
 ```1. Vilka är rollerna vid parprogrammering och vilka uppgifter har varje roll?```
 
-  Drivver skriver koden och fokuserar på den tekniska implementationen, "hur"-delen.
-  Observer/navigator granskar koden och fokuserar på det bredare perspektivet, såsom att peka ut möjliga framtida problem med koden. På detta sätt avlastas Driver:n. 
+
+Drivver skriver koden och fokuserar på den tekniska implementationen, "hur"-delen.
+Observer/navigator granskar koden och fokuserar på det bredare perspektivet, såsom att peka ut möjliga framtida problem med koden. På detta sätt avlastas Driver:n. 
 
 ```2. Indexinformationen för ett ord (det vill säga i vilka teckenpositioner ordet förekommer i den stora texten) kan bli mycket stor. Hur bör positionerna lagras för att det ska bli effektivast, som text eller binärt (data streams i Java)? Bör indexinformationen lagras tillsammans med själva ordet eller på ett separat ställe?```
 
@@ -43,5 +44,9 @@ def hash_function(word):
     return hash_value
 ```
 
-Hashfunktionen fungerar då den alltid kommer ge samma hash för samma följd av tre första bokstäverna.
-Genom att multiplicera unicode-värdet med (256 ** i) får vi olika hashvärden för samma tecken på olika positioner
+Motivering: Funktionen tar ett ord (word) som den fyller ut med blanksteg ifall sökordet är under tre tecken långt (ex. "ål" blir "ål "). 
+Hashfunktionen tittar sedan på en bokstav i taget av de tre första, och för varje tecken skapas ett hashvärde genom att multiplicera tecknets
+unicode-värde med (256 ** i) för att se till att undvika överlapp för ASCII eller andra teckensystem som använder upp till 8 bitar.
+Genom att multiplicera unicode-värdet med (256 ** i) får vi olika hashvärden för samma tecken på olika positioner, vilket är viktigt då vi annars 
+kan få samma hashvärde för två olika ord. T.ex. hade "dog" och "god" genererat samma hashvärde om hashen inte påverkades av ordning på tecknena. 
+Enumerate-loopen körs tre gånger och adderar ihop varje teckens hashvärde till "hash_value", som sedan returneras. 
