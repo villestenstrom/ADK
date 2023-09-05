@@ -1,6 +1,4 @@
 import sys
-import time
-from file_read_backwards import FileReadBackwards
 
 word = sys.argv[1]
 
@@ -65,14 +63,12 @@ def search(word):
     from time import time
     start_time = time()
     load_three_letter("labb1/three_letter.txt")
-    end_time_three_letter = time()
     
     word_prefix = word[:3]
     i = three_letter_data[word_prefix]
     j = three_letter_data[get_next_entry(three_letter_data, word_prefix)]
     
     with open("labb1/rawindex.txt", "r", encoding="latin-1") as f:
-        """
         while j-i > 1000:
             
             m = (i + j) // 2
@@ -86,7 +82,6 @@ def search(word):
                 i = m
             else:
                 j = m
-        """
             
         f.seek(i)
         f.readline() # Prevent list index out of range
@@ -97,6 +92,48 @@ def search(word):
                 print("Time to search: ", time() - start_time)
                 
                 occurances = []
+                
+                buffer_size = 256  # You can adjust the buffer size as needed
+                buffer = ""
+                
+                while True:
+                    # Read a chunk from the file
+                    new_pos = max(f.tell() - buffer_size, 0)
+                    f.seek(new_pos)
+                    chunk = f.read(buffer_size)
+                    
+                    # jump back to the old position
+                    f.seek(new_pos)
+                    
+                    buffer = buffer + chunk
+                    
+                    # Look for line breaks
+                    lines = buffer.split("\n")
+                    
+                    # The last line in the list is either the rest of the buffer or an empty string
+                    # We keep it in the buffer for the next iteration
+                    buffer = lines.pop()
+                    lines = lines[1:]
+
+                    correct_word = True
+                    
+                    # Process lines
+                    for line in reversed(lines):
+                        print(line)
+                        if line.split()[0] == word:
+                            occurances.append(int(line.split()[1]))
+                            
+                        else:
+                            correct_word = False 
+                            break
+                        
+                    if correct_word == False:
+                        break
+                        
+                        
+                f.seek(i)
+                f.readline()
+                    
                 
                 while True:
                     line = f.readline()
@@ -116,8 +153,13 @@ def search(word):
    
 #construct() 
 words = search(word)
+
+if words == None:
+    print("The word", word, "does not exist in the text.")
+    sys.exit(0)
+
 word_length = len(word)
-context_length = 20
+context_length = 30
 total_length = word_length + context_length * 2
 len_words = len(words)
 
@@ -134,5 +176,5 @@ if len(words) > 25:
         with open("labb1/korpus", "r", encoding="latin-1") as f:
             for key in words:
                 f.seek(max(0, key - context_length))
-                text = f.read(total_length)
+                text = f.read(total_length).replace("\n", " ").strip()
                 print(text)
