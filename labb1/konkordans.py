@@ -2,6 +2,7 @@ import sys
 
 word = sys.argv[1]
 
+# TBD
 def construct():
     # Initialize an empty dictionary to store the unique three-letter prefixes and their positions
     three_letter_prefixes = {}
@@ -26,12 +27,14 @@ def construct():
                 three_letter_prefixes[prefix] = position
 
     # Write the output file
-    with open('labb1/three_letter.txt', 'w') as outfile:
+    with open('labb1/three_letter.txt', 'w', encoding="latin-1") as outfile:
         for prefix, position in three_letter_prefixes.items():
             outfile.write(f"{prefix} {position}\n")
 
     print("Output file has been created.")
     
+    
+# Help function for loading the three_letter.txt file into a dictionary
 three_letter_data = {}
 def load_three_letter(textfile):
 
@@ -41,7 +44,8 @@ def load_three_letter(textfile):
             prefix, position = line.strip().split()
             position = int(position)  # Convert the position from string to integer
             three_letter_data[prefix] = position
-            
+        
+# Help function for getting the next entry in a dictionary    
 def get_next_entry(dictionary, key):
     temp = list(dictionary)
     try:
@@ -63,6 +67,8 @@ def search(word):
     from time import time
     start_time = time()
     load_three_letter("labb1/three_letter.txt")
+    
+    word = word.lower()
     
     word_prefix = word[:3]
     i = three_letter_data[word_prefix]
@@ -91,50 +97,47 @@ def search(word):
             if line_word == word:
                 print("Time to search: ", time() - start_time)
                 
-                occurances = []
+                # now we want to read the file backwards until we find a line that does not contain the word
+                # then we want to read line by line until we find a line that does contain the word
+                # then we want to read the rest of the file line by line until we find a line that does not contain the word
                 
-                buffer_size = 256  # You can adjust the buffer size as needed
-                buffer = ""
+                occurances = []
+                buffer_size = 100000  # You can adjust the buffer size as needed
+                new_pos = i
                 
                 while True:
                     # Read a chunk from the file
                     new_pos = max(f.tell() - buffer_size, 0)
-                    f.seek(new_pos)
-                    chunk = f.read(buffer_size)
                     
-                    # jump back to the old position
                     f.seek(new_pos)
                     
-                    buffer = buffer + chunk
+                    f.readline()
+                    line = f.readline()
                     
-                    # Look for line breaks
-                    lines = buffer.split("\n")
+                    found_word, _ = line.split()
                     
-                    # The last line in the list is either the rest of the buffer or an empty string
-                    # We keep it in the buffer for the next iteration
-                    buffer = lines.pop()
-                    lines = lines[1:]
-
-                    correct_word = True
-                    
-                    # Process lines
-                    for line in reversed(lines):
-                        print(line)
-                        if line.split()[0] == word:
-                            occurances.append(int(line.split()[1]))
+                    # If we still find the right word we have not yet found the first occurance
+                    if found_word != word:
+                        
+                        # We have found a line that does not contain the word
+                        # Go forward until we find a line that does contain the word
+                        while True:
+                            line = f.readline()
+                            if not line:
+                                break
                             
-                        else:
-                            correct_word = False 
+                            found_word, _ = line.split()
+                            
+                            if found_word == word:
+                                first_positon = f.tell() - len(line)
+                                break
+                            
+                        if first_positon:
                             break
                         
-                    if correct_word == False:
-                        break
-                        
-                        
-                f.seek(i)
-                f.readline()
                     
-                
+                f.seek(first_positon)
+            
                 while True:
                     line = f.readline()
                     if not line:
@@ -147,11 +150,37 @@ def search(word):
                         
                     else: break
                 
+                
+                print("Time to add occurances: ", time() - start_time)
                 return occurances
             elif line_word > word:
                 return None
    
 #construct() 
+
+"""
+
+HELP FUNCTION FOR COUNTING WORD INSTANCES IN RAWINDEX.TXT TO MAKE SURE THAT THE RESULTS ARE CORRECT
+(And they are ofc :) )
+
+def count_word_instances(input_file_path, output_file_path):
+    word_count = {}
+    with open(input_file_path, 'r', encoding="latin-1") as infile:
+        for line in infile:
+            word, _ = line.strip().split()
+            word_count[word] = word_count.get(word, 0) + 1
+
+    with open(output_file_path, 'w', encoding="latin-1") as outfile:
+        for word, instances in word_count.items():
+            outfile.write(f"{word} {instances}\n")
+
+# Example usage:
+input_file_path = "labb1/rawindex.txt"
+output_file_path = "labb1/rawindex_instances.txt"
+count_word_instances(input_file_path, output_file_path)
+"""
+
+
 words = search(word)
 
 if words == None:
@@ -164,7 +193,7 @@ total_length = word_length + context_length * 2
 len_words = len(words)
 
 if len(words) > 25:
-    print("There are", len_words, "occurences of the word", word, "in the text. Do you want to print them all? (y/n)")
+    print("There are", len_words, "occurrences of the word", word, "in the text. Do you want to print them all? (y/n)")
     import sys
     
     answer = sys.stdin.readline().strip()
@@ -178,3 +207,11 @@ if len(words) > 25:
                 f.seek(max(0, key - context_length))
                 text = f.read(total_length).replace("\n", " ").strip()
                 print(text)
+                
+else:
+    print("There are", len_words, "occurrences of the word", word, "in the text.")
+    with open("labb1/korpus", "r", encoding="latin-1") as f:
+        for key in words:
+            f.seek(max(0, key - context_length))
+            text = f.read(total_length).replace("\n", " ").strip()
+            print(text)
