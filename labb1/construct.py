@@ -42,3 +42,5 @@ def construct():
             outfile.write(f"{prefix} {position}\n")
 
     print("Output file has been created.")
+    
+construct()
