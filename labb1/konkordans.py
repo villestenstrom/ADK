@@ -3,7 +3,7 @@ import sys
 word = sys.argv[1]
 kth = False
 
-my_index_path = "labb1/rawindex.txt"
+my_index_path = "labb1/index.txt"
 my_korpus_path = "labb1/korpus"
 
 three_letter_path = "labb1/three_letter.txt"
@@ -14,45 +14,17 @@ kth_korpus_path = kth_default_path + "korpus"
 
 index_path = my_index_path if not kth else kth_index_path
 korpus_path = my_korpus_path if not kth else kth_korpus_path
-
-# TBD
-def construct():
-    # Initialize an empty dictionary to store the unique three-letter prefixes and their positions
-    three_letter_prefixes = {}
     
-    print("Reading input file...")
-
-    # Read the input file
-    with open(index_path, 'r', encoding="latin-1") as infile:
-        while True:
-            position = infile.tell()  # Get the position of the file pointer
-            line = infile.readline()
-            if not line:
-                break
-            
-            word = line.strip().split()[0]
-            
-            # Take the first 3 letters from each word
-            prefix = word[:3]
-            
-            # If the prefix is not in the dictionary, add it along with its position
-            if prefix not in three_letter_prefixes:
-                three_letter_prefixes[prefix] = position
-
-    # Write the output file
-    with open('labb1/three_letter.txt', 'w', encoding="latin-1") as outfile:
-        for prefix, position in three_letter_prefixes.items():
-            outfile.write(f"{prefix} {position}\n")
-
-    print("Output file has been created.")
-    
+word_length = len(word)
+context_length = 30
+total_length = word_length + context_length * 2
     
 # Help function for loading the three_letter.txt file into a dictionary
 three_letter_data = {}
 def load_three_letter():
 
     # Read the output file
-    with open(three_letter_path, 'r', encoding="latin-1") as f:
+    with open(three_letter_path, 'r', encoding='latin-1') as f:
         for line in f:
             prefix, position = line.strip().split()
             position = int(position)  # Convert the position from string to integer
@@ -88,6 +60,7 @@ def search(word):
     j = three_letter_data[get_next_entry(three_letter_data, word_prefix)]
     
     with open(index_path, "r", encoding="latin-1") as f:
+        print("1: ", time() - start_time)
         while j-i > 1000:
             
             m = (i + j) // 2
@@ -101,9 +74,13 @@ def search(word):
                 i = m
             else:
                 j = m
+                
+        print("2: ", time() - start_time)
             
         f.seek(i)
         f.readline() # Prevent list index out of range
+        
+        print("3: ", time() - start_time)
         while True:
             line = f.readline()
             line_word = line.split()[0]
@@ -129,7 +106,11 @@ def search(word):
                     f.readline()
                     line = f.readline()
                     
-                    found_word, _ = line.split()
+                    try:
+                        found_word = line.split()[0]
+                        
+                    except ValueError:
+                        print(line)
                     
                     # If we still find the right word we have not yet found the first occurance
                     if found_word != word:
@@ -141,8 +122,8 @@ def search(word):
                             if not line:
                                 break
                             
-                            found_word, _ = line.split()
-                            
+                            found_word = line.split()[0]
+                    
                             if found_word == word:
                                 first_positon = f.tell() - len(line)
                                 break
@@ -154,46 +135,96 @@ def search(word):
                     
                 f.seek(first_positon)
                 
-                done = False
-            
-                while True:
-                    chunk = f.read(buffer_size)
-                    chunk_lines = chunk.split("\n")
-                    
-                    print("First line in chunk: ", chunk_lines[0])
-                    print("Last line in chunk: ", chunk_lines[-1])
-                    
-                    chunk_lines = chunk_lines[1:-1]
-                    
-                    counter = 0
-                    
-                    for line in chunk_lines:
-                        counter += 1
-                        
-                        line = line.strip()
-                        
-                        try:
-                            found_word, position = line.split()
-                        except ValueError: 
-                            f.seek(f.tell() - len(line))
-                            continue
+                occurrences = int(f.readline().split()[2])
+                print("There are", occurrences, "occurrences of the word", word, "in the text.")
+                
+                for i in range(25):
+                    line = f.readline().strip()
+                    found_word, position = line.split()[0], line.split()[1]
 
                     
-                        if found_word == word:
-                            occurances.append(int(position))
+                    if found_word == word:
+                        occurances.append(int(position))
                         
-                        else:
-                            done = True 
-                            break
+                
                         
-                    if done:
-                        break
+                with open(korpus_path, "r", encoding="latin-1") as f:
+                    for key in occurances:
+                        f.seek(max(0, key - context_length))
+                        text = f.read(total_length).replace("\n", " ").strip()
+                        print(text)
+                        
+                if occurrences > 25:
+                    
+                    import sys
+                    
+                    print("Do you want to print all occurrences? (y/n)")
+                    
+                    answer = sys.stdin.readline().strip()
+                    if answer == "n":
+                        sys.exit(0)
+                        
+                    elif answer == "y":
+            
+                        with open(index_path, "r", encoding="latin-1") as f:
+                            f.seek(first_positon)
+                            while True:
+                                line = f.readline().strip()
+                                found_word, position = line.split()[0], line.split()[1]
+
+                                
+                                if found_word == word:
+                                    occurances.append(int(position))
+                                    
+                                else:
+                                    break
+                            
+                        with open(korpus_path, "r", encoding="latin-1") as f:
+                            for key in occurances:
+                                f.seek(max(0, key - context_length))
+                                text = f.read(total_length).replace("\n", " ").strip()
+                                print(text)
+                            
+                        
                 
                 
-                print("Time to add occurances: ", time() - start_time)
-                return occurances
+                sys.exit(0)
             elif line_word > word:
-                return None
+                print("The word", word, "does not exist in the text.")
+                sys.exit(0)
+            
+words = search(word)
+
+
+if words == None:
+    print("The word", word, "does not exist in the text.")
+    sys.exit(0)
+
+len_words = len(words)
+
+if len(words) > 25:
+    print("There are", len_words, "occurrences of the word", word, "in the text. Do you want to print them all? (y/n)")
+    import sys
+    
+    answer = sys.stdin.readline().strip()
+    if answer == "n":
+        sys.exit(0)
+        
+    elif answer == "y":
+
+        with open(korpus_path, "r", encoding="latin-1") as f:
+            for key in words:
+                f.seek(max(0, key - context_length))
+                text = f.read(total_length).replace("\n", " ").strip()
+                print(text)
+                
+else:
+    print("There are", len_words, "occurrences of the word", word, "in the text.")
+    with open(korpus_path, "r", encoding="latin-1") as f:
+        for key in words:
+            f.seek(max(0, key - context_length))
+            text = f.read(total_length).replace("\n", " ").strip()
+            print(text)
    
 #construct() 
 
@@ -218,41 +249,3 @@ input_file_path = "labb1/rawindex.txt"
 output_file_path = "labb1/rawindex_instances.txt"
 count_word_instances(input_file_path, output_file_path)
 """
-
-
-words = search(word)
-
-if words == None:
-    print("The word", word, "does not exist in the text.")
-    sys.exit(0)
-
-word_length = len(word)
-context_length = 30
-total_length = word_length + context_length * 2
-len_words = len(words)
-
-if len(words) > 25:
-    print("There are", len_words, "occurrences of the word", word, "in the text. Do you want to print them all? (y/n)")
-    import sys
-    
-    sys.exit(0)
-    
-    answer = sys.stdin.readline().strip()
-    if answer == "n":
-        sys.exit(0)
-        
-    elif answer == "y":
-
-        with open(korpus_path, "r", encoding="latin-1") as f:
-            for key in words:
-                f.seek(max(0, key - context_length))
-                text = f.read(total_length).replace("\n", " ").strip()
-                print(text)
-                
-else:
-    print("There are", len_words, "occurrences of the word", word, "in the text.")
-    with open(korpus_path, "r", encoding="latin-1") as f:
-        for key in words:
-            f.seek(max(0, key - context_length))
-            text = f.read(total_length).replace("\n", " ").strip()
-            print(text)
