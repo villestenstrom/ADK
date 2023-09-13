@@ -1,6 +1,19 @@
 import sys
 
 word = sys.argv[1]
+kth = False
+
+my_index_path = "labb1/rawindex.txt"
+my_korpus_path = "labb1/korpus"
+
+three_letter_path = "labb1/three_letter.txt"
+
+kth_default_path = "/afs/kth.se/misc/info/kurser/DD2350/adk23/labb1/"
+kth_index_path = kth_default_path + "rawindex.txt"
+kth_korpus_path = kth_default_path + "korpus"
+
+index_path = my_index_path if not kth else kth_index_path
+korpus_path = my_korpus_path if not kth else kth_korpus_path
 
 # TBD
 def construct():
@@ -10,7 +23,7 @@ def construct():
     print("Reading input file...")
 
     # Read the input file
-    with open('labb1/rawindex.txt', 'r', encoding="latin-1") as infile:
+    with open(index_path, 'r', encoding="latin-1") as infile:
         while True:
             position = infile.tell()  # Get the position of the file pointer
             line = infile.readline()
@@ -36,10 +49,10 @@ def construct():
     
 # Help function for loading the three_letter.txt file into a dictionary
 three_letter_data = {}
-def load_three_letter(textfile):
+def load_three_letter():
 
     # Read the output file
-    with open(textfile, 'r', encoding="latin-1") as f:
+    with open(three_letter_path, 'r', encoding="latin-1") as f:
         for line in f:
             prefix, position = line.strip().split()
             position = int(position)  # Convert the position from string to integer
@@ -66,7 +79,7 @@ Returns: The first position of the word in L"""
 def search(word):
     from time import time
     start_time = time()
-    load_three_letter("labb1/three_letter.txt")
+    load_three_letter()
     
     word = word.lower()
     
@@ -74,7 +87,7 @@ def search(word):
     i = three_letter_data[word_prefix]
     j = three_letter_data[get_next_entry(three_letter_data, word_prefix)]
     
-    with open("labb1/rawindex.txt", "r", encoding="latin-1") as f:
+    with open(index_path, "r", encoding="latin-1") as f:
         while j-i > 1000:
             
             m = (i + j) // 2
@@ -202,7 +215,7 @@ if len(words) > 25:
         
     elif answer == "y":
 
-        with open("labb1/korpus", "r", encoding="latin-1") as f:
+        with open(korpus_path, "r", encoding="latin-1") as f:
             for key in words:
                 f.seek(max(0, key - context_length))
                 text = f.read(total_length).replace("\n", " ").strip()
@@ -210,7 +223,7 @@ if len(words) > 25:
                 
 else:
     print("There are", len_words, "occurrences of the word", word, "in the text.")
-    with open("labb1/korpus", "r", encoding="latin-1") as f:
+    with open(korpus_path, "r", encoding="latin-1") as f:
         for key in words:
             f.seek(max(0, key - context_length))
             text = f.read(total_length).replace("\n", " ").strip()
