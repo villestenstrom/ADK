@@ -1,4 +1,4 @@
-kth = False
+kth = True
 
 my_index_path = "labb1/rawindex.txt"
 my_korpus_path = "labb1/korpus"
