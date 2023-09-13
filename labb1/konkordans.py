@@ -118,6 +118,8 @@ def search(word):
                 buffer_size = 100000  # You can adjust the buffer size as needed
                 new_pos = i
                 
+                start_time  = time()
+                
                 while True:
                     # Read a chunk from the file
                     new_pos = max(f.tell() - buffer_size, 0)
@@ -148,20 +150,44 @@ def search(word):
                         if first_positon:
                             break
                         
+                print("Time to find first position: ", time() - start_time)
                     
                 f.seek(first_positon)
+                
+                done = False
             
                 while True:
-                    line = f.readline()
-                    if not line:
-                        break
+                    chunk = f.read(buffer_size)
+                    chunk_lines = chunk.split("\n")
                     
-                    found_word, position = line.split()
+                    print("First line in chunk: ", chunk_lines[0])
+                    print("Last line in chunk: ", chunk_lines[-1])
                     
-                    if found_word == word:
-                        occurances.append(int(position))
+                    chunk_lines = chunk_lines[1:-1]
+                    
+                    counter = 0
+                    
+                    for line in chunk_lines:
+                        counter += 1
                         
-                    else: break
+                        line = line.strip()
+                        
+                        try:
+                            found_word, position = line.split()
+                        except ValueError: 
+                            f.seek(f.tell() - len(line))
+                            continue
+
+                    
+                        if found_word == word:
+                            occurances.append(int(position))
+                        
+                        else:
+                            done = True 
+                            break
+                        
+                    if done:
+                        break
                 
                 
                 print("Time to add occurances: ", time() - start_time)
@@ -208,6 +234,8 @@ len_words = len(words)
 if len(words) > 25:
     print("There are", len_words, "occurrences of the word", word, "in the text. Do you want to print them all? (y/n)")
     import sys
+    
+    sys.exit(0)
     
     answer = sys.stdin.readline().strip()
     if answer == "n":
