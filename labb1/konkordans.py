@@ -167,7 +167,13 @@ def search(word):
 
                 f.seek(first_position)
 
-                count = int(f.readline().split()[2])
+                word, position, count = f.readline().strip().split()
+                
+                position = int(position)
+                count = int(count)
+                
+                occurrences.append(int(position))
+                
                 print(
                     "There are",
                     count,
