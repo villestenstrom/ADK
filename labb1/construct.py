@@ -1,4 +1,4 @@
-kth = False
+kth = True
 
 raw_index_path = "labb1/rawindex.txt"
 my_index_path = "labb1/index.txt"
@@ -10,7 +10,7 @@ kth_default_path = "/afs/kth.se/misc/info/kurser/DD2350/adk23/labb1/"
 kth_index_path = kth_default_path + "rawindex.txt"
 kth_korpus_path = kth_default_path + "korpus"
 
-index_path = my_index_path if not kth else kth_index_path
+index_path = raw_index_path if not kth else kth_index_path
 korpus_path = my_korpus_path if not kth else kth_korpus_path
     
 def construct(three_letter_only):
@@ -23,7 +23,7 @@ def construct(three_letter_only):
     position_in_file = 0
 
     # Read the input file
-    with open(raw_index_path, 'r', encoding='latin-1') as infile:
+    with open(index_path, 'r', encoding='latin-1') as infile:
         
         counter = 0
         while True:

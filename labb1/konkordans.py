@@ -16,18 +16,17 @@ def validate_and_get_word():
 word = validate_and_get_word()
 
 # True == KTH, False == home
-kth = False
+kth = True
 
 my_index_path = "labb1/index.txt"
 my_korpus_path = "labb1/korpus"
-
 three_letter_path = "labb1/three_letter.txt"
 
 kth_default_path = "/afs/kth.se/misc/info/kurser/DD2350/adk23/labb1/"
 kth_index_path = kth_default_path + "rawindex.txt"
 kth_korpus_path = kth_default_path + "korpus"
 
-index_path = my_index_path if not kth else kth_index_path
+index_path = my_index_path
 korpus_path = my_korpus_path if not kth else kth_korpus_path
 
 word_length = len(word)
