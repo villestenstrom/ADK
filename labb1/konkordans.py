@@ -1,6 +1,19 @@
+import re
 import sys
 
-word = sys.argv[1]
+
+# Check for correct input
+def validate_and_get_word():
+    word = sys.argv[1]
+
+    if not re.match("^[a-zA-Z]+$", word):
+        print(f"'{word}' is not a valid word. Please input only alphabetic characters.")
+        sys.exit(1)
+
+    return word
+
+
+word = validate_and_get_word()
 
 # True == KTH, False == home
 kth = False
