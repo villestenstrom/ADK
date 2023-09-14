@@ -2,7 +2,16 @@ import re
 import sys
 
 
-word = sys.argv[1]
+def validate_and_get_word():
+    word = sys.argv[1]
+
+    if not re.match("^[a-öA-Ö]+$", word):
+        print(f"'{word}' is not a valid word. Please input only alphabetic characters.")
+        sys.exit(1)
+
+    return word
+
+word = validate_and_get_word()
 
 # True == KTH, False == home
 kth = False
@@ -24,8 +33,6 @@ total_length = word_length + context_length * 2
 
 # Help function for loading the three_letter.txt file into a dictionary
 three_letter_data = {}
-
-
 def load_three_letter():
     # Read the output file
     with open(three_letter_path, "r", encoding="latin-1") as f:
@@ -93,7 +100,12 @@ def search(word):
         # Linear search
         while True:
             line = f.readline()
-            line_word = line.split()[0]
+            
+            try:
+                line_word = line.split()[0]
+            except IndexError:
+                # reached last line in file
+                break
             
             if line_word == word:
                 print("Time to search: ", time() - start_time)
