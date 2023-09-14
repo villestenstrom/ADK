@@ -2,21 +2,10 @@ import re
 import sys
 
 
-# Check for correct input
-def validate_and_get_word():
-    word = sys.argv[1]
-
-    if not re.match("^[a-zA-Z]+$", word):
-        print(f"'{word}' is not a valid word. Please input only alphabetic characters.")
-        sys.exit(1)
-
-    return word
-
-
-word = validate_and_get_word()
+word = sys.argv[1]
 
 # True == KTH, False == home
-kth = True
+kth = False
 
 my_index_path = "labb1/index.txt"
 my_korpus_path = "labb1/korpus"
@@ -52,7 +41,7 @@ def get_next_entry(dictionary, key):
     try:
         res = temp[temp.index(key) + 1]
     except (ValueError, IndexError):
-        res = None
+        res = temp[temp.index(key)]
 
     return res
 
@@ -76,12 +65,12 @@ def search(word):
     word = word.lower()
     word_prefix = word[:3]
 
+    # Load in positions associated with the prefix and the next prefix
     i = three_letter_data[word_prefix]
     j = three_letter_data[get_next_entry(three_letter_data, word_prefix)]
 
     # Binary search
     with open(index_path, "r", encoding="latin-1") as f:
-        print("1: ", time() - start_time)
 
         # Binary search until we're close enough to the word
         while j - i > 1000:
@@ -98,17 +87,14 @@ def search(word):
             else:
                 j = m
 
-        print("2: ", time() - start_time)
-
         f.seek(i)
-        f.readline()  # Prevent list index out of range
-
-        print("3: ", time() - start_time)
+        f.readline()  # Prevent list index out of range (can be in the middle of a line)
 
         # Linear search
         while True:
             line = f.readline()
             line_word = line.split()[0]
+            
             if line_word == word:
                 print("Time to search: ", time() - start_time)
 
@@ -117,12 +103,11 @@ def search(word):
                 # then we want to read the rest of the file line by line until we find a line that does not contain the word
 
                 occurrences = []
-                buffer_size = 100000  # You can adjust the buffer size as needed
+                buffer_size = 10000
                 new_pos = i
 
-                start_time = time()
-
                 checked_start_of_file = False
+
 
                 while True:
                     new_pos = max(f.tell() - buffer_size, 0)
@@ -139,10 +124,7 @@ def search(word):
 
                     line = f.readline()
 
-                    try:
-                        found_word = line.split()[0]
-                    except ValueError:
-                        print(line)
+                    found_word = line.split()[0]
 
                     # If we still find the right word we have not yet found the first occurance
                     if found_word != word:
@@ -161,8 +143,6 @@ def search(word):
 
                         if first_position:
                             break
-
-                print("Time to find first position: ", time() - start_time)
 
                 f.seek(first_position)
 
@@ -184,6 +164,11 @@ def search(word):
                 # Print up to 25 occurrences
                 for i in range(25 if count > 25 else count):
                     line = f.readline().strip()
+                    
+                    # last line in file
+                    if line == "":
+                        break
+                    
                     found_word, position = line.split()[0], line.split()[1]
 
                     if found_word == word:

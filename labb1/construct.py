@@ -25,7 +25,6 @@ def construct(three_letter_only):
     # Read the input file
     with open(index_path, 'r', encoding='latin-1') as infile:
         
-        counter = 0
         while True:
             line = infile.readline()
             if not line:
@@ -40,15 +39,16 @@ def construct(three_letter_only):
             if prefix not in three_letter_prefixes:
                 three_letter_prefixes[prefix] = position_in_file
             
+            # Instead of using infile.tell() to get the position we keep track of it ourselves (much faster)
             position_in_file += len(line)
                 
             if word not in index:
                 index[word] = {
                     "positions": [position],
-                    "total_occurrences": 1,
+                    "occurrences": 1,
                 }
             else:
-                index[word]["total_occurrences"] += 1
+                index[word]["occurrences"] += 1
                 index[word]["positions"].append(position)
 
     # Write the output file
@@ -56,6 +56,7 @@ def construct(three_letter_only):
         for prefix, position in three_letter_prefixes.items():
             outfile.write(f"{prefix} {position}\n")
          
+    # just for testing, to not have to construct both files every time
     if three_letter_only:
         return   
     with open(my_index_path, "w", encoding="latin-1") as outfile:
@@ -64,9 +65,10 @@ def construct(three_letter_only):
             for position in data["positions"]:
                 # check if first iteration
                 if first:
-                    outfile.write(f"{word} {position} {data['total_occurrences']} \n")
+                    outfile.write(f"{word} {position} {data['occurrences']} \n")
                     first = False
                     
+                # otherwise only write the word and position
                 else:
                     outfile.write(f"{word} {position}\n")
             
