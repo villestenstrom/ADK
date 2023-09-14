@@ -1,6 +1,8 @@
 import sys
 
 word = sys.argv[1]
+
+# True == KTH, False == home
 kth = False
 
 my_index_path = "labb1/index.txt"
@@ -53,6 +55,7 @@ Returns: The first position of the word in L"""
 
 
 def search(word):
+    first_position = 0
     from time import time
 
     start_time = time()
@@ -64,9 +67,13 @@ def search(word):
     i = three_letter_data[word_prefix]
     j = three_letter_data[get_next_entry(three_letter_data, word_prefix)]
 
+    # Binary search
     with open(index_path, "r", encoding="latin-1") as f:
         print("1: ", time() - start_time)
+
+        # Binary search until we're close enough to the word
         while j - i > 1000:
+            # Middle of file
             m = (i + j) // 2
 
             f.seek(m)
@@ -85,6 +92,8 @@ def search(word):
         f.readline()  # Prevent list index out of range
 
         print("3: ", time() - start_time)
+
+        # Linear search
         while True:
             line = f.readline()
             line_word = line.split()[0]
@@ -101,18 +110,25 @@ def search(word):
 
                 start_time = time()
 
-                while True:
-                    # Read a chunk from the file
-                    new_pos = max(f.tell() - buffer_size, 0)
+                checked_start_of_file = False
 
+                while True:
+                    new_pos = max(f.tell() - buffer_size, 0)
                     f.seek(new_pos)
 
+                    # Read partial line to ensure next readline starts at a full line
                     f.readline()
+
+                    # Check if we've reached the beginning of the file
+                    if new_pos == 0:
+                        if checked_start_of_file:
+                            break  # Exit if we've already checked the start of the file
+                        checked_start_of_file = True
+
                     line = f.readline()
 
                     try:
                         found_word = line.split()[0]
-
                     except ValueError:
                         print(line)
 
@@ -128,15 +144,15 @@ def search(word):
                             found_word = line.split()[0]
 
                             if found_word == word:
-                                first_positon = f.tell() - len(line)
+                                first_position = f.tell() - len(line)
                                 break
 
-                        if first_positon:
+                        if first_position:
                             break
 
                 print("Time to find first position: ", time() - start_time)
 
-                f.seek(first_positon)
+                f.seek(first_position)
 
                 count = int(f.readline().split()[2])
                 print(
@@ -147,6 +163,7 @@ def search(word):
                     "in the text.",
                 )
 
+                # Print up to 25 occurrences
                 for i in range(25):
                     line = f.readline().strip()
                     found_word, position = line.split()[0], line.split()[1]
@@ -160,6 +177,7 @@ def search(word):
                         text = f.read(total_length).replace("\n", " ").strip()
                         print(text)
 
+                # If there are more than 25 occurrences, ask the user if they want to print them all
                 if count > 25:
                     print("Do you want to print all occurrences? (y/n)")
 
@@ -169,7 +187,9 @@ def search(word):
 
                     elif answer == "y":
                         with open(index_path, "r", encoding="latin-1") as f:
-                            f.seek(first_positon)
+                            f.seek(first_position)
+
+                            # Store all occurrences in a list
                             while True:
                                 line = f.readline().strip()
                                 found_word, position = line.split()[0], line.split()[1]
@@ -180,6 +200,7 @@ def search(word):
                                 else:
                                     break
 
+                        # Print all occurrences from the list with context
                         with open(korpus_path, "r", encoding="latin-1") as f:
                             for key in occurrences:
                                 f.seek(max(0, key - context_length))
@@ -201,6 +222,7 @@ if words == None:
 
 len_words = len(words)
 
+
 if len(words) > 25:
     print(
         "There are",
@@ -216,11 +238,13 @@ if len(words) > 25:
 
     elif answer == "y":
         with open(korpus_path, "r", encoding="latin-1") as f:
+            # Print until there are no more occurrences
             for key in words:
                 f.seek(max(0, key - context_length))
                 text = f.read(total_length).replace("\n", " ").strip()
                 print(text)
 
+# If the number of occurrences is less than 25, print them all
 else:
     print("There are", len_words, "occurrences of the word", word, "in the text.")
     with open(korpus_path, "r", encoding="latin-1") as f:
@@ -228,27 +252,3 @@ else:
             f.seek(max(0, key - context_length))
             text = f.read(total_length).replace("\n", " ").strip()
             print(text)
-
-# construct()
-
-"""
-
-HELP FUNCTION FOR COUNTING WORD INSTANCES IN RAWINDEX.TXT TO MAKE SURE THAT THE RESULTS ARE CORRECT
-(And they are ofc :) )
-
-def count_word_instances(input_file_path, output_file_path):
-    word_count = {}
-    with open(input_file_path, 'r', encoding="latin-1") as infile:
-        for line in infile:
-            word, _ = line.strip().split()
-            word_count[word] = word_count.get(word, 0) + 1
-
-    with open(output_file_path, 'w', encoding="latin-1") as outfile:
-        for word, instances in word_count.items():
-            outfile.write(f"{word} {instances}\n")
-
-# Example usage:
-input_file_path = "labb1/rawindex.txt"
-output_file_path = "labb1/rawindex_instances.txt"
-count_word_instances(input_file_path, output_file_path)
-"""
