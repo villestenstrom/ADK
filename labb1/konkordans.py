@@ -182,7 +182,7 @@ def search(word):
                 )
 
                 # Print up to 25 occurrences
-                for i in range(25):
+                for i in range(25 if count > 25 else count):
                     line = f.readline().strip()
                     found_word, position = line.split()[0], line.split()[1]
 
