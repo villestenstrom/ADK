@@ -8,41 +8,42 @@ import java.util.List;
 public class ClosestWords {
   LinkedList<String> closestWords = null;
   int closestDistance = -1;
-  char[] latestWord = { ' ' };
+  String latestWord = "";
 
-  int partDist(char[] w1, char[] w2, int w1len, int w2len, int[][] memo) {
+  int partDist(String w1, String w2, int w1len, int w2len, int[][] memo, int start) {
 
-    int memo_value = memo[w1len][w2len];
-    if (memo_value != 0)
-      return memo_value;
+    for (int i = 0; i <= w1len; i++) {
+      for (int j = start; j <= w2len; j++) {
 
-    if (w1len == 0)
-      return w2len;
-    if (w2len == 0)
-      return w1len;
+        if (memo[i][j] != 0) {
+          continue;
+        } else if (i == 0) {
+          memo[i][j] = j;
+        } else if (j == 0) {
+          memo[i][j] = i;
+        } else {
+          int addLetter = memo[i - 1][j] + 1;
+          int deleteLetter = memo[i][j - 1] + 1;
+          int replaceCost = (w1.charAt(i - 1) == w2.charAt(j - 1)) ? 0 : 1;
+          int replaceLetter = memo[i - 1][j - 1] + replaceCost;
 
-    int replaceLetter = partDist(w1, w2, w1len - 1, w2len - 1, memo) +
-        (w1[w1len - 1] == w2[w2len - 1] ? 0 : 1);
-    int deleteLetter = partDist(w1, w2, w1len, w2len - 1, memo) + 1;
-    int addLetter = partDist(w1, w2, w1len - 1, w2len, memo) + 1;
-
-    int res = Math.min(Math.min(addLetter, deleteLetter), replaceLetter);
-
-    memo[w1len][w2len] = res;
-    return res;
+          memo[i][j] = Math.min(Math.min(addLetter, deleteLetter), replaceLetter);
+        }
+      }
+    }
+    return memo[w1len][w2len];
   }
 
-  int distance(char[] w1, char[] w2, int[][] memo) {
-    return partDist(w1, w2, w1.length, w2.length, memo);
+  int distance(String w1, String w2, int[][] memo, int start) {
+    return partDist(w1, w2, w1.length(), w2.length(), memo, start);
   }
 
   public ClosestWords(String w, List<String> wordList) {
-    int longestWord = 35;
+    int longestWord = 21;
     int[] zeroArray = new int[longestWord];
     int[][] memo = new int[w.length() + 1][longestWord];
     int differentLettersIndex = 0;
     for (String s : wordList) {
-      char[] sCharArray = s.toCharArray();
       if (closestDistance != -1) {
         int lengthDifference = Math.abs(s.length() - w.length());
         if (lengthDifference > closestDistance) {
@@ -50,23 +51,20 @@ public class ClosestWords {
         }
 
         differentLettersIndex = 0;
-        for (int i = 0; i < Math.min(s.length(), latestWord.length); i++) {
-          if (sCharArray[i] != latestWord[i]) {
+        for (int i = 0; i < Math.min(s.length(), latestWord.length()); i++) {
+          if (s.charAt(i) != latestWord.charAt(i)) {
             break;
           }
           differentLettersIndex++;
         }
 
+        for (int i = 0; i < w.length() + 1; i++) {
+          System.arraycopy(zeroArray, 0, memo[i], differentLettersIndex, longestWord - differentLettersIndex);
+        }
+
       }
-      latestWord = sCharArray;
 
-      for (int i = 0; i < w.length() + 1; i++) {
-        System.arraycopy(zeroArray, 0, memo[i], differentLettersIndex, longestWord - differentLettersIndex);
-      }
-
-      char[] wCharArray = w.toCharArray();
-
-      int dist = distance(wCharArray, sCharArray, memo);
+      int dist = distance(w, s, memo, differentLettersIndex);
       // System.out.println("d(" + w + "," + s + ")=" + dist);
       if (dist < closestDistance || closestDistance == -1) {
         closestDistance = dist;
