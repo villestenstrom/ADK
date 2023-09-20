@@ -1,9 +1,5 @@
 ## 1. Formulera rekursionen (partDist i programmet) så kompakt som möjligt med matematisk notation.
-partDist(w1, w2, w1len, w2len) = {
-    w1len om w2len == 0
-    w2len om w1len == 0
-    min(partDist(w1, w2, w1len-1, w2len) + 1, partDist(w1, w2, w1len, w2len-1) + 1, partDist(w1, w2, w1len-1, w2len-1) + 1*(w1[w1len] != w2[w2len]))
-}
+
 
 ## 2. Beräkna partDist("labd", "blad", x, y) för alla x och y mellan 0 och 4 och för in värdena i en matris M. Vad blir M?
 ```
@@ -72,6 +68,6 @@ För att bestämma för ett n-bokstavsord och ett m-bokstavsord blir det alltså
 Det enda som skiljer är den sista cellen som nu är 3 instället för 2. Det är logiskt då det enda som är skillnaden mellan de två matriserna är att den ena har "labd" och den andra har "labs". Allt är samma förutom den sista bokstaven i ordet vilket endast den sista cellen påverkas av.
 
 ## 10. Allmänt sett, vilken del av matriserna för Y-X och Z-X skiljer när orden Y och Z har samma första p bokstäver?
-Alla celler från M[p+1][p+1] till M[ylen][zlen] kommer att förändras
+Alla celler från M[p+1][p+1] till M[ylen][zlen] kommer att förändras. Detta då alla celler innan (M[0][0] till M[p][p]) beskriver hur många operationer som krävs för att gå från de p första bokstäverna i Y till de p första bokstäverna i Z (och dessa är ju samma).
 
 
