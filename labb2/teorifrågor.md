@@ -1,6 +1,11 @@
 ## 1. Formulera rekursionen (partDist i programmet) så kompakt som möjligt med matematisk notation.
+<<<<<<< HEAD
 
 
+=======
+![Text](./Screenshot%202023-09-20%20at%2023.29.11.png)
+
+>>>>>>> 3c1fed826e987e48e323ff47c1df6d2fb482c024
 ## 2. Beräkna partDist("labd", "blad", x, y) för alla x och y mellan 0 och 4 och för in värdena i en matris M. Vad blir M?
 ```
 0	1	2	3	4
