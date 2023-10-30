@@ -10,6 +10,7 @@ public class ClosestWordsOld {
   int closestDistance = -1;
 
   int partDist(String w1, String w2, int w1len, int w2len) {
+
     if (w1len == 0)
       return w2len;
     if (w2len == 0)
@@ -26,6 +27,7 @@ public class ClosestWordsOld {
   }
 
   int distance(String w1, String w2) {
+    
     return partDist(w1, w2, w1.length(), w2.length());
   }
 

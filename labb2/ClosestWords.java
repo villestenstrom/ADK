@@ -34,6 +34,7 @@ public class ClosestWords {
   }
 
   int distance(String w1, String w2, int start) {
+    
     return partDist(w1, w2, w1.length(), w2.length(), start);
   }
 
@@ -53,6 +54,7 @@ public class ClosestWords {
           }
           differentLettersIndex++;
         }
+        
       }
       latestWord = s;
 
