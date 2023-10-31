@@ -1,7 +1,7 @@
 public class Pair {
 
     private int first, second, capacity, flow;
-    
+
     public Pair(int first, int second) {
         this.first = first;
         this.second = second;
@@ -49,4 +49,18 @@ public class Pair {
         }
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "(" + first + ", " + second + ")";
+    }
+
+    @Override
+    public int hashCode() {
+
+        int result = Integer.hashCode(first);
+        result = 31 * result + Integer.hashCode(second);
+        return result;
+    }
+
 }
