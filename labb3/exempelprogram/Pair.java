@@ -1,6 +1,6 @@
 public class Pair {
 
-    private int first, second, capacity, flow, residualCapacity;
+    private int first, second, capacity, flow;
     
     public Pair(int first, int second) {
         this.first = first;
@@ -38,11 +38,7 @@ public class Pair {
     }
 
     public int getResidualCapacity() {
-        return residualCapacity;
-    }
-
-    public void setResidualCapacity(int newResidualCapacity) {
-        residualCapacity = newResidualCapacity;
+        return capacity - flow;
     }
 
     @Override
