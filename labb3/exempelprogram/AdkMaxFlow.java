@@ -1,15 +1,19 @@
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+/*
+* @author: Ville Stenström, Melvin Amandusson
+*/
+
 public class AdkMaxFlow {
 
     Kattio io;
+    List<List<Pair>> adjList;
 
-    boolean bfs(int nodes, ArrayList<Pair> edges, int s, int t, int[] parent) {
-
+    boolean bfs(int nodes, int s, int t, int[] parent) {
         boolean visited[] = new boolean[nodes + 1];
         for (int i = 1; i <= nodes; i++) {
             visited[i] = false;
@@ -21,50 +25,26 @@ public class AdkMaxFlow {
 
         while (!q.isEmpty()) {
             int u = q.poll();
-            for (int i = 0; i < edges.size(); i++) {
-
-                Pair currentEdge = edges.get(i);
+            for (Pair currentEdge : adjList.get(u)) {
                 int v = currentEdge.getSecond();
-
-                if (currentEdge.getFirst() == u) {
-                    if (!visited[v] && currentEdge.getResidualCapacity() > 0) {
-
-                        parent[v] = u;
-
-                        if (currentEdge.getSecond() == t) {
-                            return true;
-                        }
-
-                        q.add(v);
-                        visited[v] = true;
-
-                    }
+                if (!visited[v] && currentEdge.getResidualCapacity() > 0) {
+                    parent[v] = u;
+                    if (v == t)
+                        return true;
+                    q.add(v);
+                    visited[v] = true;
                 }
             }
         }
 
         return false;
-
     }
 
     void solveFlow(boolean debug) {
-        int nodes = io.getInt();
-        int s = io.getInt();
-        int t = io.getInt();
-        int e = io.getInt();
-
-        Map<Pair, Pair> edges = new HashMap<Pair, Pair>();
-
-        for (int i = 0; i < e; ++i) {
-            int a = io.getInt();
-            int b = io.getInt();
-            int f = io.getInt();
-
-            edges.put(new Pair(a, b), new Pair(a, b, f));
-        }
+        int nodes, s, t, e;
+        Map<Pair, Pair> edges = new LinkedHashMap<Pair, Pair>();
 
         if (debug) {
-            edges.clear();
 
             nodes = 4;
             s = 1;
@@ -75,10 +55,37 @@ public class AdkMaxFlow {
             edges.put(new Pair(1, 3), new Pair(1, 3, 2));
             edges.put(new Pair(2, 4), new Pair(2, 4, 2));
             edges.put(new Pair(3, 2), new Pair(3, 2, 2));
+            edges.put(new Pair(2, 3), new Pair(2, 3, 1));
             edges.put(new Pair(3, 4), new Pair(3, 4, 1));
-        }
+        } else {
+            nodes = io.getInt();
+            s = io.getInt();
+            t = io.getInt();
+            e = io.getInt();
 
-        Map<Pair, Pair> reverseEdges = new HashMap<Pair, Pair>();
+            adjList = new ArrayList<>(nodes + 1);
+            for (int i = 0; i <= nodes; i++) {
+                adjList.add(new ArrayList<>());
+            }
+
+            for (int i = 0; i < e; ++i) {
+                int a = io.getInt();
+                int b = io.getInt();
+                int f = io.getInt();
+
+                Pair edge = new Pair(a, b, f);
+                edges.put(new Pair(a, b), edge);
+                adjList.get(a).add(edge);
+
+                // Lägg till omvänd kant om den inte redan finns
+                if (!edges.containsKey(new Pair(b, a))) {
+                    Pair reverseEdge = new Pair(b, a, 0); // Kapacitet 0 till en början
+                    edges.put(new Pair(b, a), reverseEdge);
+                    adjList.get(b).add(reverseEdge);
+                }
+
+            }
+        }
 
         // implement ford-fulkerson here
         for (Pair edge : edges.values()) {
@@ -90,23 +97,15 @@ public class AdkMaxFlow {
             int b = edge.getSecond();
             edge.setFlow(0);
 
-            Pair reverseEdge = new Pair(b, a);
-            reverseEdge.setFlow(0);
-            reverseEdges.put(new Pair(b, a), reverseEdge);
-
         }
 
-        int[] parent = new int[nodes + 1];
+        int[] parent = new int[10000000];
 
-        while (bfs(nodes, new ArrayList<>(edges.values()), s, t, parent)) {
+        while (bfs(nodes, s, t, parent)) {
 
             int currentMaxFlow = Integer.MAX_VALUE;
             for (int v = t; v != s; v = parent[v]) {
-
                 int u = parent[v];
-
-                System.out.println(" v: " + v + " u: " + u);
-
                 Pair edge = edges.get(new Pair(u, v));
                 currentMaxFlow = Math.min(currentMaxFlow, edge.getResidualCapacity());
             }
@@ -114,62 +113,56 @@ public class AdkMaxFlow {
             for (int v = t; v != s; v = parent[v]) {
                 int u = parent[v];
                 Pair edge = edges.get(new Pair(u, v));
-                // Pair reverseEdge = reverseEdges.get(new Pair(v, u));
 
                 edge.setFlow(edge.getFlow() + currentMaxFlow);
-                // reverseEdge.setFlow(-edge.getFlow());
+
+                // Uppdatera det residuala flödet för den omvända kanten
+                Pair reverseEdge = edges.get(new Pair(v, u));
+                reverseEdge.setFlow(reverseEdge.getFlow() - currentMaxFlow);
+
             }
+        }
+
+        int maxFlow = 0;
+        for (Pair edge : edges.values()) {
+            if (edge.getFirst() == s) {
+                maxFlow += edge.getFlow();
+            }
+        }
+
+        ArrayList<Pair> edgesWithFlow = new ArrayList<>();
+        for (Pair edge : edges.values()) {
+            if (edge.getFlow() > 0 && edge.getFlow() <= edge.getCapacity()) {
+                edgesWithFlow.add(edge);
+            }
+        }
+
+        io.println(nodes);
+        io.println(s + " " + t + " " + maxFlow);
+        io.println(edgesWithFlow.size());
+
+        for (Pair edge : edgesWithFlow) {
+            io.println(edge.getFirst() + " " + edge.getSecond() + " " + edge.getFlow());
         }
 
         if (debug) {
-            System.out.println("Number of nodes: " + nodes);
-            System.out.println("Source node: " + s);
-            System.out.println("Target node: " + t);
-
-            int maxFlow = 0;
-            for (Pair edge : edges.values()) {
-                if (edge.getFirst() == s) { // Summing the flow from source node
-                    maxFlow += edge.getFlow();
-                }
-            }
-            System.out.println("Max flow: " + maxFlow);
-
-            System.out.println("Edge pairs and their corresponding final flow:");
-            for (Pair edge : edges.values()) {
-                System.out.println("(" + edge.getFirst() + ", " + edge.getSecond() + "): " + edge.getFlow());
-            }
-        } else {
-            int maxFlow = 0;
-            for (Pair edge : edges.values()) {
-                if (edge.getFirst() == s) { // Summing the flow from source node
-                    maxFlow += edge.getFlow();
-                }
-            }
-
-            io.println(nodes);
-            io.println(s + " " + t + " " + maxFlow);
-            io.println(e);
-
-            for (Pair edge : edges.values()) {
-                io.println(edge.getFirst() + " " + edge.getSecond() + " " + edge.getFlow());
+            System.out.println(nodes);
+            System.out.println(s + " " + t + " " + maxFlow);
+            System.out.println(edgesWithFlow.size());
+            for (Pair edge : edgesWithFlow) {
+                System.out.println(edge.getFirst() + " " + edge.getSecond() + " " + edge.getFlow());
             }
         }
-
     }
 
     AdkMaxFlow() {
         io = new Kattio(System.in, System.out);
-
         boolean debug = false;
-
         solveFlow(debug);
-
         io.close();
     }
 
     public static void main(String args[]) {
-        System.out.println("Hello World!");
         new AdkMaxFlow();
     }
-
 }
