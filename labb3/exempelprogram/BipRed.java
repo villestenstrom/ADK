@@ -10,7 +10,7 @@ import java.util.Map;
  * Använder Kattio.java för in- och utläsning.
  * Se http://kattis.csc.kth.se/doc/javaio
  *
- * @author: Per Austrin
+ * @author: Per Austrin, Ville Stenström, Melvin Amandusson
  */
 
 public class BipRed {
