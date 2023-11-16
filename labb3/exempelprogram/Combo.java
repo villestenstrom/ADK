@@ -39,7 +39,7 @@ public class Combo {
 
 	List<Pair> writeFlowGraph() {
 		v = x + y + 2;
-		int s = x + y + 1, t = s + 1, c = 10;
+		int s = x + y + 1, t = s + 1, c = 1;
 
 		// Skapa en lista för att lagra kanterna
 		List<Pair> flowEdgesList = new ArrayList<>();
@@ -139,7 +139,7 @@ public class Combo {
 				int u = parent[v];
 				Pair edge = edges.get(new Pair(u, v));
 
-				edge.setFlow(edge.getFlow() + currentMaxFlow);
+				edge6.setFlow(edge.getFlow() + currentMaxFlow);
 
 				// Uppdatera det residuala flödet för den omvända kanten
 				Pair reverseEdge = edges.get(new Pair(v, u));
@@ -157,7 +157,7 @@ public class Combo {
 
 		ArrayList<Pair> edgesWithFlow = new ArrayList<>();
 		for (Pair edge : edges.values()) {
-			if (edge.getFlow() > 0 && edge.getFlow() <= edge.getCapacity()) {
+			if (edge.getFlow() > 0) {
 				edgesWithFlow.add(edge);
 			}
 		}
