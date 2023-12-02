@@ -22,7 +22,6 @@ public class AdkNPReduction {
          * Requirements:
          * - Same actor can play multiple roles
          * - Same role can only be played by one actor
-         * - Each actor can only play one role in each scene
          * - Every role must be present in at least one scene
          * Additional:
          * - The divas p1 and p2 are guaranteed at least one role each
@@ -42,12 +41,17 @@ public class AdkNPReduction {
         io.println(s);
         io.println(k);
 
+        // actorsInRoles
+        // each new line is a new role
+        // each int is an actor that can play that role
         io.println("1 1");
         io.println("1 2");
 
-        String actorsInRole = m + " ";
+        int x = k > n ? n : k;
 
-        for (int i = 3; i < k + 1; i++) {
+        String actorsInRole = (x - 2) + " ";
+
+        for (int i = 3; i < x + 1; i++) {
             actorsInRole += i + " ";
         }
 
@@ -55,12 +59,16 @@ public class AdkNPReduction {
             io.println(actorsInRole);
         }
 
+        // rolesInScenes
+        // each new line is a new scene
+        // each int is a role in that scene
         io.println("2 1 3");
         io.println("2 2 3");
 
         for (int i = 3; i < n + 1; i++) {
-            io.println("2 2 " + i);
+            io.println("2 1 " + i);
         }
+
 
         for (int i = 0; i < E; i++) {
 
@@ -71,7 +79,6 @@ public class AdkNPReduction {
 
             io.println("2 " + (from + 2) + " " + (to + 2));
         }
-
     }
 
     AdkNPReduction() {
@@ -85,5 +92,4 @@ public class AdkNPReduction {
     public static void main(String[] args) {
         new AdkNPReduction();
     }
-
 }
