@@ -21,7 +21,7 @@ public class Main {
 
         solveRoleAssignmentProblem(n, s, k, actorsInRoles, roleInScenesMap);
 
-        printResult();
+        printResult(true);
 
         io.close();
 
@@ -132,6 +132,8 @@ public class Main {
         int superactorsCount = 0;
         boolean diva1Assigned = false, diva2Assigned = false;
 
+        boolean[] actorAlreadyAssigned = new boolean[actors];
+
         // Assign roles with fewest possible actors first
         // Loop through list where i is the role and j is the actor
         rolesLoop: for (int i = 0; i < actorsForRoles.length; i++) {
@@ -209,7 +211,7 @@ public class Main {
                 for (int k = 0; k < assignedRoles[actor].length; k++) {
 
                     if (assignedRoles[actor][k] == 0) {
-                        // No more roles to check, assign the actor to the current role
+                        // Dont have to check a role that the actor is not assigned to
                         continue;
                     }
 
@@ -243,7 +245,12 @@ public class Main {
 
                 // else
                 assignedRoles[actor][i] = 1;
-                totalNumberOfActors++;
+
+                if (!actorAlreadyAssigned[actor]) {
+                    actorAlreadyAssigned[actor] = true;
+                    totalNumberOfActors++;
+                }
+
                 continue rolesLoop;
             }
         }
@@ -258,30 +265,59 @@ public class Main {
         return -1;
     }
 
-    public void printResult() {
-        io.println(totalNumberOfActors);
-        for (int i = 0; i < assignedRoles.length; i++) {
+    public void printResult(boolean debug) {
 
-            int numRoles = 0;
-            for (int j = 0; j < assignedRoles[i].length; j++) {
-                if (assignedRoles[i][j] == 1) {
-                    numRoles++;
+        if (debug) {
+            System.out.println(totalNumberOfActors);
+            for (int i = 0; i < assignedRoles.length; i++) {
+
+                int numRoles = 0;
+                for (int j = 0; j < assignedRoles[i].length; j++) {
+                    if (assignedRoles[i][j] == 1) {
+                        numRoles++;
+                    }
                 }
-            }
 
-            if (numRoles == 0) {
-                continue;
-            }
-
-            io.print(i + 1 + " " + numRoles + " ");
-
-            for (int j = 0; j < assignedRoles[i].length; j++) {
-                if (assignedRoles[i][j] == 1) {
-                    io.print(j + 1 + " ");
+                if (numRoles == 0) {
+                    continue;
                 }
-            }
 
-            io.print("\n");
+                System.out.print(i + 1 + " " + numRoles + " ");
+
+                for (int j = 0; j < assignedRoles[i].length; j++) {
+                    if (assignedRoles[i][j] == 1) {
+                        System.out.print(j + 1 + " ");
+                    }
+                }
+
+                System.out.print("\n");
+            }
+        } else {
+
+            io.println(totalNumberOfActors);
+            for (int i = 0; i < assignedRoles.length; i++) {
+
+                int numRoles = 0;
+                for (int j = 0; j < assignedRoles[i].length; j++) {
+                    if (assignedRoles[i][j] == 1) {
+                        numRoles++;
+                    }
+                }
+
+                if (numRoles == 0) {
+                    continue;
+                }
+
+                io.print(i + 1 + " " + numRoles + " ");
+
+                for (int j = 0; j < assignedRoles[i].length; j++) {
+                    if (assignedRoles[i][j] == 1) {
+                        io.print(j + 1 + " ");
+                    }
+                }
+
+                io.print("\n");
+            }
         }
 
     }
