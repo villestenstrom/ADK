@@ -145,8 +145,17 @@ public class Main {
 
             actorLoop: for (int j = 0; j < actorsForRoles[i].length; j++) {
 
-                // Get the actor that can play the role
-                int actor = actorsForRoles[i][j] - 1;
+                int actor;
+                if (actorsForRoles[i][j] == 0) {
+                    // Assign superactor, give them some actor number
+                    actor = actors + superactorsCount;
+                    assignedRoles[actor][i] = 1;
+                    superactorsCount++;
+                    totalNumberOfActors++;
+                    continue rolesLoop;
+                } else {
+                    actor = actorsForRoles[i][j] - 1;
+                }
 
                 if (actor == 0 || actor == 1) {
                     // Diva
@@ -207,43 +216,47 @@ public class Main {
                     }
                 }
 
-                // Loop over all roles that the actor is assigned to
-                for (int k = 0; k < assignedRoles[actor].length; k++) {
+                if (actor >= 0 && actor < actors) {
+                    // Loop over all roles that the actor is assigned to
+                    for (int k = 0; k < assignedRoles[actor].length; k++) {
 
-                    if (assignedRoles[actor][k] == 0) {
-                        // Dont have to check a role that the actor is not assigned to
-                        continue;
-                    }
+                        if (assignedRoles[actor][k] == 0) {
+                            // Dont have to check a role that the actor is not assigned to
+                            continue;
+                        }
 
-                    // Limit amount of iterations
-                    if (k == -1) {
-                        // Assign superactor, give them some actor number
-                        superactorsCount++;
-                        assignedRoles[actors + superactorsCount][i] = 1;
+                        // Limit amount of iterations
+                        if (k == -1) {
+                            // Assign superactor, give them some actor number
+                            assignedRoles[actors + superactorsCount][i] = 1;
+                            superactorsCount++;
 
-                        // Update total number of actors, but DON'T insert
-                        // the superactor into the assignedRoles array
-                        totalNumberOfActors++;
-                        continue rolesLoop;
-                    }
+                            // Update total number of actors, but DON'T insert
+                            // the superactor into the assignedRoles array
+                            totalNumberOfActors++;
+                            continue rolesLoop;
+                        }
 
-                    // Get the role that the actor is assigned to
-                    int role = k;
+                        // Get the role that the actor is assigned to
+                        int role = k;
 
-                    // Retrieve lists of scenes for the current role and the role to assign
-                    List<Integer> scenesForCurrentRole = roleInScenesMap.get(role);
-                    List<Integer> scenesForNewRole = roleInScenesMap.get(i);
+                        // Retrieve lists of scenes for the current role and the role to assign
+                        List<Integer> scenesForCurrentRole = roleInScenesMap.get(role);
+                        List<Integer> scenesForNewRole = roleInScenesMap.get(i);
 
-                    // Check if there is any scene overlap
-                    for (Integer scene : scenesForNewRole) {
-                        if (scenesForCurrentRole.contains(scene)) {
-                            // The actor is already assigned to a role in the same scene, try the next actor
-                            continue actorLoop;
+                        // Check if there is any scene overlap
+                        for (Integer scene : scenesForNewRole) {
+                            if (scenesForCurrentRole.contains(scene)) {
+                                // The actor is already assigned to a role in the same scene, try the next actor
+                                continue actorLoop;
+                            }
                         }
                     }
+                } else {
+                    System.out.println("Error: Actor number is out of bounds");
                 }
 
-                // else
+                // else assign the role to the actor/super actor
                 assignedRoles[actor][i] = 1;
 
                 if (!actorAlreadyAssigned[actor]) {
