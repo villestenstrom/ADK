@@ -143,6 +143,9 @@ public class Main {
 
         boolean[] actorAlreadyAssigned = new boolean[actors];
 
+        List<Integer> firstDivaRoles = diva1CanPlay.size() <= diva2CanPlay.size() ? diva1CanPlay : diva2CanPlay;
+        List<Integer> secondDivaRoles = diva1CanPlay.size() > diva2CanPlay.size() ? diva1CanPlay : diva2CanPlay;
+
         outerLoop: for (Integer firstDivaRole : diva1CanPlay) {
             for (Integer secondDivaRole : diva2CanPlay) {
 
@@ -184,6 +187,7 @@ public class Main {
             actorLoop: for (int j = 0; j < actorsForRoles[i].length; j++) {
 
                 if (actorsForRoles[i][j] == 0) {
+
                     // Assign superactor, give them some actor number
                     assignedRoles[actors + superactorsCount][i] = 1;
                     superactorsCount++;
@@ -230,6 +234,13 @@ public class Main {
 
                 continue rolesLoop;
             }
+
+            // If we get here, no actor could be assigned to the role
+            // Assign superactor, give them some actor number
+            assignedRoles[actors + superactorsCount][i] = 1;
+            superactorsCount++;
+            totalNumberOfActors++;
+
         }
     }
 
