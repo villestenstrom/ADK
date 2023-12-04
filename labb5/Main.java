@@ -84,9 +84,9 @@ public class Main {
                 int actor = io.getInt();
 
                 if (actor == 1) {
-                    diva1CanPlay.add(i + 1);
+                    diva1CanPlay.add(i);
                 } else if (actor == 2) {
-                    diva2CanPlay.add(i + 1);
+                    diva2CanPlay.add(i);
                 }
 
                 actorsInRoles[i][j] = actor;
