@@ -21,7 +21,7 @@ public class Main {
 
         solveRoleAssignmentProblem(n, s, k, actorsInRoles, roleInScenesMap);
 
-        printResult(true);
+        printResult(false);
 
         io.close();
 
@@ -218,8 +218,8 @@ public class Main {
                     // Limit amount of iterations
                     if (k == -1) {
                         // Assign superactor, give them some actor number
-                        superactorsCount++;
                         assignedRoles[actors + superactorsCount][i] = 1;
+                        superactorsCount++;
 
                         // Update total number of actors, but DON'T insert
                         // the superactor into the assignedRoles array
