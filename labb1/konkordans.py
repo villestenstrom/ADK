@@ -1,15 +1,44 @@
 import re
 import sys
+<<<<<<< HEAD
+=======
+import time
+from file_read_backwards import FileReadBackwards
+>>>>>>> ad32071 (main functionality working)
 
 
 def validate_and_get_word():
     word = sys.argv[1]
 
+<<<<<<< HEAD
     if not re.match("^[a-öA-Ö]+$", word):
         print(f"'{word}' is not a valid word. Please input only alphabetic characters.")
         sys.exit(1)
 
     return word
+=======
+    # Read the input file
+    with open('labb1/rawindex.txt', 'r', encoding="latin-1") as infile:
+        while True:
+            position = infile.tell()  # Get the position of the file pointer
+            line = infile.readline()
+            if not line:
+                break
+            
+            word = line.strip().split()[0]
+            
+            # Take the first 3 letters from each word
+            prefix = word[:3]
+            
+            # If the prefix is not in the dictionary, add it along with its position
+            if prefix not in three_letter_prefixes:
+                three_letter_prefixes[prefix] = position
+
+    # Write the output file
+    with open('labb1/three_letter.txt', 'w') as outfile:
+        for prefix, position in three_letter_prefixes.items():
+            outfile.write(f"{prefix} {position}\n")
+>>>>>>> ad32071 (main functionality working)
 
 word = validate_and_get_word()
 
@@ -60,13 +89,17 @@ Requires:
 - Indexarray A[abc] with format: <abc> <position in I>]
 
 Returns: The first position of the word in L"""
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> ad32071 (main functionality working)
 def search(word):
     first_position = 0
     from time import time
 
     start_time = time()
+<<<<<<< HEAD
     load_three_letter()
 
     word = word.lower()
@@ -89,10 +122,31 @@ def search(word):
 
             s = f.readline().split()[0]
 
+=======
+    load_three_letter("labb1/three_letter.txt")
+    end_time_three_letter = time()
+    
+    word_prefix = word[:3]
+    i = three_letter_data[word_prefix]
+    j = three_letter_data[get_next_entry(three_letter_data, word_prefix)]
+    
+    with open("labb1/rawindex.txt", "r", encoding="latin-1") as f:
+        """
+        while j-i > 1000:
+            
+            m = (i + j) // 2
+            
+            f.seek(m)
+            f.readline()
+            
+            s = f.readline().split()[0]
+            
+>>>>>>> ad32071 (main functionality working)
             if s <= word:
                 i = m
             else:
                 j = m
+<<<<<<< HEAD
 
         f.seek(i)
         f.readline()  # Prevent list index out of range (can be in the middle of a line)
@@ -267,3 +321,55 @@ else:
             f.seek(max(0, key - context_length))
             text = f.read(total_length).replace("\n", " ").strip()
             print(text)
+=======
+        """
+            
+        f.seek(i)
+        f.readline() # Prevent list index out of range
+        while True:
+            line = f.readline()
+            line_word = line.split()[0]
+            if line_word == word:
+                print("Time to search: ", time() - start_time)
+                
+                occurances = []
+                
+                while True:
+                    line = f.readline()
+                    if not line:
+                        break
+                    
+                    found_word, position = line.split()
+                    
+                    if found_word == word:
+                        occurances.append(int(position))
+                        
+                    else: break
+                
+                return occurances
+            elif line_word > word:
+                return None
+   
+#construct() 
+words = search(word)
+word_length = len(word)
+context_length = 20
+total_length = word_length + context_length * 2
+len_words = len(words)
+
+if len(words) > 25:
+    print("There are", len_words, "occurences of the word", word, "in the text. Do you want to print them all? (y/n)")
+    import sys
+    
+    answer = sys.stdin.readline().strip()
+    if answer == "n":
+        sys.exit(0)
+        
+    elif answer == "y":
+
+        with open("labb1/korpus", "r", encoding="latin-1") as f:
+            for key in words:
+                f.seek(max(0, key - context_length))
+                text = f.read(total_length)
+                print(text)
+>>>>>>> ad32071 (main functionality working)
